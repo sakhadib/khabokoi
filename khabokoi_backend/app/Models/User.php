@@ -63,4 +63,86 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
+
+
+    //--------------------RELATIONSHIPS--------------------
+    // Define relationships with other models             |
+    //-----------------------------------------------------
+
+    /**
+     * get related restaurant owners
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function restaurantOwners()
+    {
+        return $this->hasMany(RestaurantOwner::class);
+    }
+
+
+    /**
+     * get related search histories
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function searchHistories()
+    {
+        return $this->hasMany(SearchHistory::class);
+    }
+
+
+    /**
+     * get related branch reviews
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function branchReviews()
+    {
+        return $this->hasMany(BranchReview::class);
+    }
+
+
+    /**
+     * get related branch ratings
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function branchRatings()
+    {
+        return $this->hasMany(BranchRating::class);
+    }
+
+
+    /**
+     * get wishlist
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function wishlists()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
+
+    /**
+     * get related cuisine reviews
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function cuisineReviews()
+    {
+        return $this->hasMany(CuisineReview::class);
+    }
+
+
+    /**
+     * get related cuisine ratings
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function cuisineRatings()
+    {
+        return $this->hasMany(CuisineRating::class);
+    }
 }
