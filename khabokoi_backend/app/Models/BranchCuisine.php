@@ -9,6 +9,11 @@ class BranchCuisine extends Model
 {
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
         'branch_id',
         'cuisine_id',
@@ -20,26 +25,60 @@ class BranchCuisine extends Model
         'is_available',
     ];
 
+
+
+    /**
+     * Get the branch that owns the BranchCuisine
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function branch()
     {
         return $this->belongsTo(Branch::class);
     }
 
+
+
+
+    /**
+     * Get the cuisine that owns the BranchCuisine
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function cuisine()
     {
         return $this->belongsTo(Cuisine::class);
     }
 
+
+
+
+    /**
+     * Get the cuisine Reviews for the BranchCuisine
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function cuisineReviews()
     {
         return $this->hasMany(CuisineReview::class);
     }
 
+
+
+
+    /**
+     * Get the cuisineRatings for the BranchCuisine
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function cuisineRating()
     {
         return $this->hasMany(CuisineRating::class);
     }
 
+
+
+
+    /**
+     * Get the wishlists for the BranchCuisine
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function wishlists()
     {
         return $this->hasMany(Wishlist::class);
