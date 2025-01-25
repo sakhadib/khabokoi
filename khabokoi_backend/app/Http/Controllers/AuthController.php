@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Laravel\Socialite\Facades\Socialite;
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -106,5 +108,81 @@ class AuthController extends Controller
         ]);
 
         return response()->json($user);
+    }
+
+
+    // Redirect to Google
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+
+    public function handleGoogleCallback()
+    {
+        try {
+            $googleUser = Socialite::driver('google')->stateless()->user(); // Ensure 'stateless' is used for API
+    
+            $user = User::where('email', $googleUser->getEmail())->first();
+    
+            if (!$user) {
+                $user = new User();
+                $user->username = explode('@', $googleUser->getEmail())[0];
+                $user->email = $googleUser->getEmail();
+                $user->password = bcrypt('default-password'); // Placeholder password
+
+                $user->save();
+            }
+    
+            // Generate a JWT token
+            $token = auth()->login($user);
+    
+            return response()->json([
+                'access_token' => $token,
+                'token_type' => 'bearer',
+            ]);
+    
+        } catch (\Exception $e) {    
+            return response()->json(
+                [
+                    'error' => 'Failed to authenticate', 
+                    'message' => $e->getMessage()
+                ], 500
+            );
+        }
+    }
+    
+
+    // Redirect to Facebook
+    public function redirectToFacebook()
+    {
+        return Socialite::driver('facebook')->redirect();
+    }
+
+    // Handle Facebook callback
+    public function handleFacebookCallback()
+    {
+        try {
+            $facebookUser = Socialite::driver('facebook')->user();
+
+            // Check if the user already exists
+            $user = User::firstOrCreate(
+                ['email' => $facebookUser->getEmail()],
+                [
+                    'name' => $facebookUser->getName(),
+                    'password' => bcrypt('default-password'), // Placeholder password
+                ]
+            );
+
+            // Generate a JWT token
+            $token = auth()->login($user);
+
+            return response()->json([
+                'access_token' => $token,
+                'token_type' => 'bearer',
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to authenticate'], 500);
+        }
     }
 }

@@ -19,6 +19,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// Facebook Routes
+Route::get('auth/facebook/redirect', [AuthController::class, 'redirectToFacebook']);
+Route::get('auth/facebook/callback', [AuthController::class, 'handleFacebookCallback']);
+
+
 
 Route::group([
 
