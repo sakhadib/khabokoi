@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RestaurantController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -40,3 +42,20 @@ Route::group([
 
 
 Route::post('register', [AuthController::class, 'register']);
+
+
+Route::group([
+
+    'middleware' => 'api',
+    'prefix' => 'restaurant'
+
+], function ($router) {
+
+    Route::post('create', [RestaurantController::class, 'create']);
+    Route::post('addowner', [RestaurantController::class, 'addOwner']);
+
+    Route::get('all', [RestaurantController::class, 'all']);
+    Route::get('show/{id}', [RestaurantController::class, 'show']);
+    Route::post('update/{id}', [RestaurantController::class, 'update']);
+    Route::delete('delete/{id}', [RestaurantController::class, 'delete']);
+});

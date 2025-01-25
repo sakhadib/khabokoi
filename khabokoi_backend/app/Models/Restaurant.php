@@ -30,7 +30,7 @@ class Restaurant extends Model
      */
     public function owners()
     {
-        return $this->hasMany(RestaurantOwner::class);
+        return $this->hasMany(RestaurantOwner::class)->with('user:id,username');
     }
 
 

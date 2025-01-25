@@ -93,21 +93,29 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        // Validate the request data
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
+        try{
+            // Validate the request data
+            $validatedData = $request->validate([
+                'username' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:8|confirmed',
+            ]);
 
-        // Hash the password and create the user
-        $user = \App\Models\User::create([
-            'name' => $validatedData['name'],
-            'email' => $validatedData['email'],
-            'password' => bcrypt($validatedData['password']),
-        ]);
+            // Hash the password and create the user
+            $user = User::create([
+                'username' => $validatedData['username'],
+                'email' => $validatedData['email'],
+                'password' => bcrypt($validatedData['password']),
+            ]);
 
-        return response()->json($user);
+            return response()->json($user);
+        }
+        catch(\Exception $e){
+            return response()->json([
+                'error' => 'Failed to register user',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 
 
@@ -128,7 +136,7 @@ class AuthController extends Controller
                 $user = new User();
                 $user->username = explode('@', $googleUser->getEmail())[0];
                 $user->email = $googleUser->getEmail();
-                $user->password = bcrypt('default-password'); // Placeholder password
+                $user->password = bcrypt(env('DEFAULT_PASSWORD')); // Placeholder password
 
                 $user->save();
             }
