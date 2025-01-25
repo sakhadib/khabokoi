@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RestaurantController;
+use App\Http\Controllers\BranchController;
 
 
 /*
@@ -53,9 +54,31 @@ Route::group([
 
     Route::post('create', [RestaurantController::class, 'create']);
     Route::post('addowner', [RestaurantController::class, 'addOwner']);
+    Route::get('myrestaurants', [RestaurantController::class, 'myRestaurants']);
+
+});
+
+Route::group([
+
+    'prefix' => 'restaurant'
+    //* Accessible by all users. so no middleware
+
+], function ($router) {
 
     Route::get('all', [RestaurantController::class, 'all']);
     Route::get('show/{id}', [RestaurantController::class, 'show']);
-    Route::post('update/{id}', [RestaurantController::class, 'update']);
-    Route::delete('delete/{id}', [RestaurantController::class, 'delete']);
+
+});
+
+
+
+Route::group([
+
+    'middleware' => 'api',
+    'prefix' => 'restaurant/branch'
+
+], function ($router) {
+
+    Route::post('create', [BranchController::class, 'create']);
+
 });

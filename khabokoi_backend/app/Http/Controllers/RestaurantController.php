@@ -126,4 +126,66 @@ class RestaurantController extends Controller
             ], 422);
         }
     }
+
+
+
+    /**
+     * Get all restaurants.
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function all()
+    {
+        $restaurants = Restaurant::withCount('branches')->get();
+
+        return response()->json([
+            'restaurants' => $restaurants,
+        ], 200);
+    }
+
+
+
+    /**
+     * Get a restaurant by id.
+     * 
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function show($id)
+    {
+        $restaurant = Restaurant::with('branches', 'owners')->find($id);
+
+        if(!$restaurant){
+            return response()->json([
+                'message' => 'Restaurant not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'restaurant' => $restaurant,
+        ], 200);
+    }
+
+
+
+
+    /**
+     * Get all restaurants owned by the authenticated user.
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function myRestaurants()
+    {
+        $user = auth()->user();
+
+        $restaurants = $user->restaurantOwners;
+
+        return response()->json([
+            'restaurants' => $restaurants,
+        ], 200);
+    }
+
+
+
+    
 }
