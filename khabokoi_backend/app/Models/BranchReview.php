@@ -67,6 +67,6 @@ class BranchReview extends Model
      */
     public function children()
     {
-        return $this->hasMany(BranchReview::class, 'parent_id');
+        return $this->hasMany(BranchReview::class, 'parent_id')->with('children.user:id,username');
     }
 }

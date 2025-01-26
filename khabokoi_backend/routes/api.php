@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\BranchController;
+use App\Http\Controllers\ReviewController;
 
 
 /*
@@ -67,6 +68,7 @@ Route::group([
 
     Route::get('all', [RestaurantController::class, 'all']);
     Route::get('show/{id}', [RestaurantController::class, 'show']);
+    Route::post('branch/review/all', [ReviewController::class, 'all']);
 
 });
 
@@ -80,5 +82,10 @@ Route::group([
 ], function ($router) {
 
     Route::post('create', [BranchController::class, 'create']);
+    Route::post('update', [BranchController::class, 'update']);
+    Route::post('delete', [BranchController::class, 'delete']);
+
+    Route::post('review', [ReviewController::class, 'create']);
+    Route::post('review/delete', [ReviewController::class, 'delete']);
 
 });
