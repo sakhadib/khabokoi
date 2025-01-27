@@ -45,7 +45,7 @@ class BranchCuisine extends Model
      */
     public function cuisine()
     {
-        return $this->belongsTo(Cuisine::class);
+        return $this->belongsTo(Cuisine::class)->with('category');
     }
 
 
