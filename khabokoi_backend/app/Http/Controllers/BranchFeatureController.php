@@ -212,4 +212,38 @@ class BranchFeatureController extends Controller
             ], 404);
         }
     }
+
+
+
+    /**
+     * Get branches with a specific feature
+     * 
+     * @param $feature_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function branches($feature_id)
+    {
+        $branchFeatures = BranchFeatures::where('feature_id', $feature_id)
+            ->with('branch', 'feature')
+            ->get();
+
+        if($branchFeatures->count() > 0)
+        {
+            return response()->json([
+                'message' => 'Branches retrieved successfully',
+                'data' => $branchFeatures
+            ], 200);
+        }
+        else
+        {
+            return response()->json([
+                'message' => 'Branches not found'
+            ], 404);
+        }
+    }
+
+
+
+
+    
 }
