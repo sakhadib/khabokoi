@@ -119,5 +119,87 @@ class ReviewController extends Controller
             ], 400);
         }
     }
+
+
+
+
+    /**
+     * Get review count of a branch.
+     * 
+     * @param  $branch_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function count($branch_id)
+    {
+        $count = BranchReview::where('branch_id', $branch_id)->count();
+
+        return response()->json([
+            'count' => $count,
+        ], 200);
+    }
+
+
+
+
+    /**
+     * Get review count of a branch year wise.
+     * 
+     * @param  $branch_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function countYearWise($branch_id)
+    {
+        $reviews = BranchReview::where('branch_id', $branch_id)
+            ->selectRaw('YEAR(created_at) as year, COUNT(*) as count')
+            ->groupBy('year')
+            ->get();
+
+        return response()->json([
+            'reviews' => $reviews,
+        ], 200);
+    }
+
+
+
+
+    /**
+     * Get review count of a branch month wise.
+     * 
+     * @param  $branch_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function countMonthWise($branch_id)
+    {
+        $reviews = BranchReview::where('branch_id', $branch_id)
+            ->selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, COUNT(*) as count')
+            ->groupBy('year', 'month')
+            ->get();
+
+        return response()->json([
+            'reviews' => $reviews,
+        ], 200);
+    }
+
+
+
+
+
+    /**
+     * Get review count of a branch day wise.
+     * 
+     * @param  $branch_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function countDayWise($branch_id)
+    {
+        $reviews = BranchReview::where('branch_id', $branch_id)
+            ->selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, DAY(created_at) as day, COUNT(*) as count')
+            ->groupBy('year', 'month', 'day')
+            ->get();
+
+        return response()->json([
+            'reviews' => $reviews,
+        ], 200);
+    }
 }
 
