@@ -405,5 +405,182 @@ class CuisineRatingReviewController extends Controller
             'data' => $cuisineReview
         ], 200);
     }
+
+
+
+
+    //--------------------------------------------------------------Cuisine Review : GET--------------------------------------------------------------//
+
+    /**
+     * Get all reviews of a branch cuisine
+     * 
+     * @param $branch_cuisine_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAllReviews($branch_cuisine_id)
+    {
+        $branchCuisine = BranchCuisine::with(['cuisine', 'reviews' => function($query) {
+            $query->with('user');
+        }])->find($branch_cuisine_id);
+
+        if (!$branchCuisine) {
+            return response()->json([
+            'message' => 'Branch cuisine not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'message' => 'All reviews fetched successfully',
+            'data' => $branchCuisine
+        ], 200);
+    }
+
+
+
+
+    /**
+     * Get my review of a branch cuisine
+     * 
+     * @param $branch_cuisine_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getMyReview($branch_cuisine_id)
+    {
+        $myReviews = CuisineReview::where('branch_cuisine_id', $branch_cuisine_id)
+            ->where('user_id', auth()->user()->id)
+            ->get();
+
+
+        if($myReviews->isEmpty()){
+            return response()->json([
+                'message' => 'You have not reviewed this cuisine'
+            ], 404);
+        }
+
+        return response()->json([
+            'message' => 'My reviews fetched successfully',
+            'data' => $myReviews
+        ], 200);
+    }
+
+
+
+
+
+    /**
+     * Get total review count of a branch cuisine
+     * 
+     * @param $branch_cuisine_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getReviewCount($branch_cuisine_id)
+    {
+        $reviewCount = CuisineReview::where('branch_cuisine_id', $branch_cuisine_id)->count();
+
+        return response()->json([
+            'message' => 'Review count fetched successfully',
+            'data' => $reviewCount
+        ], 200);
+    }
+
+
+
+
+    /**
+     * Get review count by date
+     * 
+     * @param $branch_cuisine_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getReviewCountByDate($branch_cuisine_id)
+    {
+        $reviews = CuisineReview::where('branch_cuisine_id', $branch_cuisine_id)->get();
+
+        if($reviews->isEmpty()){
+            return response()->json([
+                'message' => 'No reviews found',
+            ], 404);
+        }
+
+        $review_count = $reviews->groupBy(function($date){
+            return \Carbon\Carbon::parse($date->created_at)->format('Y-m-d');
+        });
+
+        $review_count = $review_count->map(function($item, $key){
+            return $item->count();
+        });
+
+        return response()->json([
+            'message' => 'Review count by date',
+            'review_count' => $review_count,
+        ], 200);
+    }
+
+
+
+
+    /**
+     * Get review count by month
+     * 
+     * @param $branch_cuisine_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getReviewCountByMonth($branch_cuisine_id)
+    {
+        $reviews = CuisineReview::where('branch_cuisine_id', $branch_cuisine_id)->get();
+
+        if($reviews->isEmpty()){
+            return response()->json([
+                'message' => 'No reviews found',
+            ], 404);
+        }
+
+        $review_count = $reviews->groupBy(function($date){
+            return \Carbon\Carbon::parse($date->created_at)->format('Y-m');
+        });
+
+        $review_count = $review_count->map(function($item, $key){
+            return $item->count();
+        });
+
+        return response()->json([
+            'message' => 'Review count by month',
+            'review_count' => $review_count,
+        ], 200);
+    }
+
+
+
+
+
+    /**
+     * Get review count by year
+     * 
+     * @param $branch_cuisine_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getReviewCountByYear($branch_cuisine_id)
+    {
+        $reviews = CuisineReview::where('branch_cuisine_id', $branch_cuisine_id)->get();
+
+        if($reviews->isEmpty()){
+            return response()->json([
+                'message' => 'No reviews found',
+            ], 404);
+        }
+
+        $review_count = $reviews->groupBy(function($date){
+            return \Carbon\Carbon::parse($date->created_at)->format('Y');
+        });
+
+        $review_count = $review_count->map(function($item, $key){
+            return $item->count();
+        });
+
+        return response()->json([
+            'message' => 'Review count by year',
+            'review_count' => $review_count,
+        ], 200);
+    }
     
 }

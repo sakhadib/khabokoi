@@ -29,7 +29,7 @@ class WishList extends Model
      */
     public function branchCuisine()
     {
-        return $this->belongsTo(BranchCuisine::class);
+        return $this->belongsTo(BranchCuisine::class)->with(['cuisine', 'branch', 'branch.restaurant']);
     }
 
 
