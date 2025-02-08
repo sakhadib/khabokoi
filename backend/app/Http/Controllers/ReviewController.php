@@ -167,7 +167,7 @@ class ReviewController extends Controller
      * 
      * @param  $branch_id
      * @return \Illuminate\Http\JsonResponse
-     */
+     */ 
     public function countMonthWise($branch_id)
     {
         $reviews = BranchReview::where('branch_id', $branch_id)

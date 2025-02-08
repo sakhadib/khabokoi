@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 
 use App\Models\BranchFeatures;
 use App\Models\Features;
+use App\Models\RestaurantOwner;
+use App\Models\Restaurant;
+use App\Models\Branch;
 
 class BranchFeatureController extends Controller
 {
@@ -22,6 +25,15 @@ class BranchFeatureController extends Controller
         $request->validate([
             'branch_id' => 'required|integer',
         ]);
+
+        if(!$this->amIOwner($request->branch_id))
+        {
+            return response()->json([
+                'message' => 'You are not authorized to add this branch feature'
+            ], 403);
+        }
+
+
 
         if($request->has('feature_id'))
         {
@@ -92,7 +104,16 @@ class BranchFeatureController extends Controller
             'feature_id' => 'required|integer',
         ]);
 
-        $branchFeature = BranchFeatures::where('branch_id', $request->branch_id)->where('feature_id', $request->feature_id)->first();
+        $branchFeature = BranchFeatures::where('branch_id', $request->branch_id)
+                                       ->where('feature_id', $request->feature_id)
+                                       ->first();
+
+        if(!$this->amIOwner($request->branch_id))
+        {
+            return response()->json([
+                'message' => 'You are not authorized to delete this branch feature'
+            ], 403);
+        }
 
         if($branchFeature)
         {
@@ -126,7 +147,16 @@ class BranchFeatureController extends Controller
             'is_available' => 'required|boolean',
         ]);
 
-        $branchFeature = BranchFeatures::where('branch_id', $request->branch_id)->where('feature_id', $request->feature_id)->first();
+        if(!$this->amIOwner($request->branch_id))
+        {
+            return response()->json([
+                'message' => 'You are not authorized to update this branch feature'
+            ], 403);
+        }
+
+        $branchFeature = BranchFeatures::where('branch_id', $request->branch_id)
+                                       ->where('feature_id', $request->feature_id)
+                                       ->first();
 
         if($branchFeature)
         {
@@ -163,7 +193,16 @@ class BranchFeatureController extends Controller
             'details' => 'required|string',
         ]);
 
-        $branchFeature = BranchFeatures::where('branch_id', $request->branch_id)->where('feature_id', $request->feature_id)->first();
+        if(!$this->amIOwner($request->branch_id))
+        {
+            return response()->json([
+                'message' => 'You are not authorized to update this branch feature'
+            ], 403);
+        }
+
+        $branchFeature = BranchFeatures::where('branch_id', $request->branch_id)
+                                       ->where('feature_id', $request->feature_id)
+                                       ->first();
 
         if($branchFeature)
         {
@@ -216,22 +255,55 @@ class BranchFeatureController extends Controller
 
 
     /**
-     * Get branches with a specific feature
+     * Get all available features of a branch
      * 
-     * @param $feature_id
+     * @param $branch_id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function branches($feature_id)
+    public function available($branch_id)
     {
-        $branchFeatures = BranchFeatures::where('feature_id', $feature_id)
-            ->with('branch', 'feature')
+        $branchFeatures = BranchFeatures::where('branch_id', $branch_id)
+            ->where('is_available', true)
+            ->with('feature')
+            ->get();
+
+        if($branchFeatures->count() > 0)
+        {
+            return response()->json([
+                'message' => 'Branch features retrieved successfully',
+                'data' => $branchFeatures
+            ], 200);
+        }
+        else
+        {
+            return response()->json([
+                'message' => 'Branch features not found'
+            ], 404);
+        }
+    }
+
+
+
+    /**
+     * Get branches with a specific feature
+     * 
+     * @param $feature_slug
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function branches($feature_slug)
+    {
+        $feature = Features::where('slug', $feature_slug)->first();
+        
+        $branchFeatures = BranchFeatures::where('feature_id', $feature->id)
+            ->with('branch')
             ->get();
 
         if($branchFeatures->count() > 0)
         {
             return response()->json([
                 'message' => 'Branches retrieved successfully',
-                'data' => $branchFeatures
+                'feature' => $feature,
+                'branches' => $branchFeatures
             ], 200);
         }
         else
@@ -242,6 +314,31 @@ class BranchFeatureController extends Controller
         }
     }
 
+
+
+
+    /**
+     * Check if the user is the owner of the restaurant
+     * 
+     * @param $branch_id
+     * @return boolean
+     */
+    private function amIOwner($branch_id)
+    {
+        $this_branch = Branch::find($branch_id);
+        $this_restaurant = Restaurant::find($this_branch->restaurant_id);
+
+        $owner = RestaurantOwner::where('restaurant_id', $this_restaurant->id)
+                                  ->where('user_id', auth()->user()->id)
+                                  ->first();
+
+        if(!$owner)
+        {
+            return false;
+        }
+
+        return true;
+    }
 
 
 

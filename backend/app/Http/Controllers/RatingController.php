@@ -14,7 +14,7 @@ class RatingController extends Controller
      * @param  \Illuminate\Http\Request  $request -> branch_id, rating
      * @return \Illuminate\Http\JsonResponse
      */
-    public function createBranchRating(Request $request)
+    public function create(Request $request)
     {
         try{
             $request->validate([
@@ -52,14 +52,16 @@ class RatingController extends Controller
      * @param  \Illuminate\Http\Request  $request -> branch_id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function deleteBranchRating(Request $request)
+    public function delete(Request $request)
     {
         try{
             $request->validate([
                 'branch_id' => 'required|integer',
             ]);
 
-            $rating = BranchRating::where('branch_id', $request->branch_id)->where('user_id', auth()->user()->id)->first();
+            $rating = BranchRating::where('branch_id', $request->branch_id)
+                                  ->where('user_id', auth()->user()->id)
+                                  ->first();
 
             if($rating){
                 $rating->delete();
@@ -90,7 +92,7 @@ class RatingController extends Controller
      * @param  \Illuminate\Http\Request  $request -> branch_id, rating
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updateBranchRating(Request $request)
+    public function update(Request $request)
     {
         try{
             $request->validate([
@@ -136,10 +138,14 @@ class RatingController extends Controller
      */
     public function getBranchRating($branch_id)
     {
-        $rating = BranchRating::where('branch_id', $branch_id)->avg('rating');
+        $rating = BranchRating::where('branch_id', $branch_id)
+                                ->avg('rating');
+
+        $rating_count = BranchRating::where('branch_id', $branch_id)->count();
 
         return response()->json([
             'rating' => $rating,
+            'count' => $rating_count,
         ], 200);
     }
 
@@ -154,10 +160,11 @@ class RatingController extends Controller
      */
     public function getBranchRatingCount($branch_id)
     {
-        $rating_count = BranchRating::where('branch_id', $branch_id)->count();
+        $rating_count = BranchRating::where('branch_id', $branch_id)
+                                    ->count();
 
         return response()->json([
-            'rating_count' => $rating_count,
+            'count' => $rating_count,
         ], 200);
     }
 
@@ -171,9 +178,11 @@ class RatingController extends Controller
      * @param $branch_id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getMyBranchRating($branch_id)
+    public function getMy($branch_id)
     {
-        $rating = BranchRating::where('branch_id', $branch_id)->where('user_id', auth()->user()->id)->first();
+        $rating = BranchRating::where('branch_id', $branch_id)
+                              ->where('user_id', auth()->user()->id)
+                              ->first();
 
         if($rating){
             return response()->json([
@@ -199,7 +208,10 @@ class RatingController extends Controller
      */
     public function getUserBranchRating($branch_id, $user_id)
     {
-        $rating = BranchRating::where('branch_id', $branch_id)->where('user_id', $user_id)->first();
+        $rating = BranchRating::where('branch_id', $branch_id)
+                              ->where('user_id', $user_id)
+                              ->with('user:id,username')
+                              ->first();
 
         if($rating){
             return response()->json([
@@ -226,7 +238,9 @@ class RatingController extends Controller
      */
     public function allBranchRatings($branch_id)
     {
-        $ratings = BranchRating::where('branch_id', $branch_id)->with('user:id,username')->get();
+        $ratings = BranchRating::where('branch_id', $branch_id)
+                                ->with('user:id,username')
+                                ->get(['id', 'user_id', 'rating']);
 
         if($ratings->isEmpty()){
             return response()->json([
@@ -259,7 +273,7 @@ class RatingController extends Controller
         }
 
         $rating_avg = $ratings->groupBy(function($date){
-            return \Carbon\Carbon::parse($date->created_at)->format('m');
+            return \Carbon\Carbon::parse($date->created_at)->format('Y-m');
         });
 
         $rating_avg = $rating_avg->map(function($item, $key){
@@ -324,7 +338,7 @@ class RatingController extends Controller
         }
 
         $rating_avg = $ratings->groupBy(function($date){
-            return \Carbon\Carbon::parse($date->created_at)->format('d');
+            return \Carbon\Carbon::parse($date->created_at)->format('Y-m-d');
         });
 
         $rating_avg = $rating_avg->map(function($item, $key){

@@ -6,6 +6,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\RatingController;
+use App\Http\Controllers\BranchFeatureController;
+use App\Http\Controllers\CuisineController;
 
 
 /*
@@ -29,6 +32,9 @@ Route::get('auth/facebook/callback', [AuthController::class, 'handleFacebookCall
 
 
 
+
+// TODO : Authentication Routes
+
 Route::group([
 
     'middleware' => 'api',
@@ -45,6 +51,9 @@ Route::group([
 
 Route::post('register', [AuthController::class, 'register']);
 
+
+
+// TODO : Restaurant Routes
 
 Route::group([
 
@@ -68,11 +77,26 @@ Route::group([
 
     Route::get('all', [RestaurantController::class, 'all']);
     Route::get('show/{id}', [RestaurantController::class, 'show']);
+
     Route::post('branch/review/all', [ReviewController::class, 'all']);
+    Route::get('branch/review/count/{id}', [ReviewController::class, 'count']);
+    Route::get('branch/review/yearly/{id}', [ReviewController::class, 'countYearWise']);
+    Route::get('branch/review/monthly/{id}', [ReviewController::class, 'countMonthWise']);
+    Route::get('branch/review/daily/{id}', [ReviewController::class, 'countDayWise']);
+
+    Route::get('branch/rating/{branch_id}', [RatingController::class, 'getBranchRating']);
+    Route::get('branch/rating/count/{branch_id}', [RatingController::class, 'getBranchRatingCount']);
+    Route::get('branch/userrating/{branch_id}/{user_id}', [RatingController::class, 'getUserBranchRating']);
+    Route::get('branch/rating/all/{branch_id}', [RatingController::class, 'allBranchRatings']);
+    Route::get('branch/rating/monthly/{branch_id}', [RatingController::class, 'branchRatingAverageByMonth']);
+    Route::get('branch/rating/yearly/{branch_id}', [RatingController::class, 'branchRatingAverageByYear']);
+    Route::get('branch/rating/daily/{branch_id}', [RatingController::class, 'branchRatingAverageByDay']);
 
 });
 
 
+
+// TODO : Branch Routes
 
 Route::group([
 
@@ -87,5 +111,55 @@ Route::group([
 
     Route::post('review', [ReviewController::class, 'create']);
     Route::post('review/delete', [ReviewController::class, 'delete']);
+
+    Route::post('rating', [RatingController::class, 'create']);
+    Route::post('rating/delete', [RatingController::class, 'delete']); 
+    Route::post('rating/update', [RatingController::class, 'update']);
+    Route::get('rating/my/{branch_id}', [RatingController::class, 'getMy']);
+
+
+});
+
+
+
+// TODO : Branch Feature Routes
+
+Route::group([
+
+    'middleware' => 'api',
+    'prefix' => 'restaurant/branch/feature'
+
+], function ($router) {
+
+    Route::post('create', [BranchFeatureController::class, 'create']);
+    Route::post('delete', [BranchFeatureController::class, 'delete']);
+    Route::post('update/availability', [BranchFeatureController::class, 'updateAvailability']);
+    Route::post('update/details', [BranchFeatureController::class, 'updateDetails']);
+
+});
+
+
+
+Route::group([
+    'prefix' => 'restaurant/branch/feature'
+], function ($router) {
+
+    Route::get('all/{branch_id}', [BranchFeatureController::class, 'all']);
+    Route::get('available/{branch_id}', [BranchFeatureController::class, 'available']);
+    Route::get('branches/{feature_slug}', [BranchFeatureController::class, 'branches']);    
+});
+
+
+
+
+// TODO : Cuisine Routes
+
+Route::group([
+
+    'middleware' => 'api',
+    'prefix' => 'cuisine'
+
+], function ($router) {
+
 
 });
