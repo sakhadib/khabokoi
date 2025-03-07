@@ -197,10 +197,8 @@ route::group(
 
 route::group(
     [
-        'prefix' => 'cuisine',
-        
+        'prefix' => 'cuisine', 
     ], function ($router) {
-
         Route::get('rating/cuisine/{branch_cuisine_id}', [CuisineRatingReviewController::class, 'getAverageRating']);
         Route::get('rating/count/cuisine/{branch_cuisine_id}', [CuisineRatingReviewController::class, 'getRatingCount']);
         Route::get('rating/my/cuisine/{branch_cuisine_id}', [CuisineRatingReviewController::class, 'getMyRating']);
@@ -210,5 +208,4 @@ route::group(
         Route::get('rating/monthly/cuisine/{branch_cuisine_id}', [CuisineRatingReviewController::class, 'getRatingAverageByMonth']);
         Route::get('rating/yearly/cuisine/{branch_cuisine_id}', [CuisineRatingReviewController::class, 'getRatingAverageByYear']);
     }
-
 );
