@@ -161,5 +161,20 @@ Route::group([
 
 ], function ($router) {
 
+    Route::post('create', [CuisineController::class, 'create']);
+    Route::post('update', [CuisineController::class, 'update']);
+    Route::post('delete', [CuisineController::class, 'delete']);
+});
+
+
+Route::group([
+    'prefix' => 'cuisine'
+], function ($router){
+
+    Route::get('category/all', [CuisineController::class, 'getAllCategory']);
+    Route::get('category/show/{id}', [CuisineController::class, 'getCuisineByCategory']);
+
+    Route::get('all', [CuisineController::class, 'getAllCuisine']);
+    Route::get('show/{id}', [CuisineController::class, 'getBranchCuisineByCuisine']);
 
 });

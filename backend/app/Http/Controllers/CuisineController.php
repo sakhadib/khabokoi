@@ -8,6 +8,10 @@ use App\Models\Cuisine;
 use App\Models\CuisineCategory;
 use App\Models\BranchCuisine;
 
+use App\Models\Branch;
+use App\Models\Restaurant;
+use App\Models\RestaurantOwner;
+
 class CuisineController extends Controller
 {
     /**
@@ -21,6 +25,13 @@ class CuisineController extends Controller
         $request->validate([
             'branch_id' => 'required|integer',
         ]);
+
+        if(!$this->amIOwner($request->branch_id))
+        {
+            return response()->json([
+                'message' => 'You are not authorized to add this cuisine'
+            ], 403);
+        }
 
         $category_id = null;
         $cuisine_id = null;
@@ -42,6 +53,14 @@ class CuisineController extends Controller
 
             $category_id = $category->id;
         }
+        else
+        {
+            $request->validate([
+                'category_id' => 'required|integer',
+            ]);
+
+            $category_id = $request->category_id;
+        }
 
 
         if(!$request->has('cuisine_id')){
@@ -52,11 +71,19 @@ class CuisineController extends Controller
 
             $cuisine = new Cuisine();
             $cuisine->name = $request->cuisine_name;
-            $cuisine->description = $request->cuisine_description;
-            $cuisine->category_id = $category_id;
+            $cuisine->details = $request->cuisine_description;
+            $cuisine->cuisine_category_id = $category_id;
             $cuisine->save();
 
             $cuisine_id = $cuisine->id;
+        }
+        else
+        {
+            $request->validate([
+                'cuisine_id' => 'required|integer',
+            ]);
+
+            $cuisine_id = $request->cuisine_id;
         }
 
 
@@ -82,7 +109,8 @@ class CuisineController extends Controller
         $branchCuisine->save();
 
 
-        $returnable_branchCuisine = BranchCuisine::with('cuisine')->find($branchCuisine->id);
+        $returnable_branchCuisine = BranchCuisine::with('cuisine')
+                                                 ->find($branchCuisine->id);
 
         return response()->json([
             'message' => 'Cuisine created successfully',
@@ -111,6 +139,13 @@ class CuisineController extends Controller
             return response()->json([
                 'message' => 'Cuisine not found'
             ], 404);
+        }
+
+        if(!$this->amIOwner($branchCuisine->branch_id))
+        {
+            return response()->json([
+                'message' => 'You are not authorized to update this cuisine'
+            ], 403);
         }
 
         if($request->has('nickname')){
@@ -180,6 +215,13 @@ class CuisineController extends Controller
 
         $branchCuisine = BranchCuisine::find($request->branch_cuisine_id);
 
+        if(!$this->amIOwner($branchCuisine->branch_id))
+        {
+            return response()->json([
+                'message' => 'You are not authorized to delete this cuisine'
+            ], 403);
+        }
+
         if(!$branchCuisine){
             return response()->json([
                 'message' => 'Cuisine not found'
@@ -248,7 +290,7 @@ class CuisineController extends Controller
      */
     public function getCuisineByCategory($category_id)
     {
-        $cuisines = Cuisine::where('category_id', $category_id)->get();
+        $cuisines = Cuisine::where('cuisine_category_id', $category_id)->get();
 
         return response()->json([
             'message' => 'All cuisines of the category',
@@ -268,14 +310,17 @@ class CuisineController extends Controller
     public function getBranchCuisineByCuisine($cuisine_id)
     {
         $branchCuisines = BranchCuisine::where('cuisine_id', $cuisine_id)
-            ->with('cuisine', 'branch')
+            ->with( 'branch')
             ->withCount('cuisineReviews')
             ->withAvg('cuisineRating', 'rating')
             ->get();
 
+        $cuisine = Cuisine::find($cuisine_id);
+
         return response()->json([
             'message' => 'All branch cuisines of the cuisine',
-            'data' => $branchCuisines
+            'cuisine' => $cuisine,
+            'branch_cuisine' => $branchCuisines
         ], 200);
     }
 
@@ -331,6 +376,32 @@ class CuisineController extends Controller
                 'message' => 'Cuisine not found'
             ], 404);
         }
+    }
+
+
+
+
+        /**
+     * Check if the user is the owner of the restaurant
+     * 
+     * @param $branch_id
+     * @return boolean
+     */
+    private function amIOwner($branch_id)
+    {
+        $this_branch = Branch::find($branch_id);
+        $this_restaurant = Restaurant::find($this_branch->restaurant_id);
+
+        $owner = RestaurantOwner::where('restaurant_id', $this_restaurant->id)
+                                  ->where('user_id', auth()->user()->id)
+                                  ->first();
+
+        if(!$owner)
+        {
+            return false;
+        }
+
+        return true;
     }
 
 

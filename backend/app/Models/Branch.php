@@ -67,7 +67,7 @@ class Branch extends Model
      */
     public function branchFeatures()
     {
-        return $this->hasMany(BranchFeatures::class);
+        return $this->hasMany(BranchFeatures::class)->with('feature');
     }
 
 
@@ -110,6 +110,18 @@ class Branch extends Model
     public function branchReview()
     {
         return $this->hasMany(BranchReview::class);
+    }
+
+
+    /**
+     * Get the opening_hours attribute.
+     *
+     * @param  string  $value
+     * @return mixed
+     */
+    public function getOpeningHoursAttribute($value)
+    {
+        return json_decode($value, true); // Decode to an associative array
     }
 
 
