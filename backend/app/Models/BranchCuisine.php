@@ -60,7 +60,7 @@ class BranchCuisine extends Model
      */
     public function cuisineReviews()
     {
-        return $this->hasMany(CuisineReview::class);
+        return $this->hasMany(CuisineReview::class)->with('user:id,username');
     }
 
 

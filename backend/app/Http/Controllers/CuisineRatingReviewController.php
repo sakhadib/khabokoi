@@ -420,9 +420,7 @@ class CuisineRatingReviewController extends Controller
      */
     public function getAllReviews($branch_cuisine_id)
     {
-        $branchCuisine = BranchCuisine::with(['cuisine', 'reviews' => function($query) {
-            $query->with('user');
-        }])->find($branch_cuisine_id);
+        $branchCuisine = BranchCuisine::with(['cuisine', 'cuisineReviews'])->find($branch_cuisine_id);
 
         if (!$branchCuisine) {
             return response()->json([
@@ -449,6 +447,7 @@ class CuisineRatingReviewController extends Controller
     {
         $myReviews = CuisineReview::where('branch_cuisine_id', $branch_cuisine_id)
             ->where('user_id', auth()->user()->id)
+            ->with('branchCuisine')
             ->get();
 
 
@@ -480,7 +479,7 @@ class CuisineRatingReviewController extends Controller
 
         return response()->json([
             'message' => 'Review count fetched successfully',
-            'data' => $reviewCount
+            'count' => $reviewCount
         ], 200);
     }
 

@@ -190,8 +190,11 @@ route::group(
 
         Route::post('rating/create', [CuisineRatingReviewController::class, 'createRating']);
         Route::post('rating/delete', [CuisineRatingReviewController::class, 'deleteRating']);
-    }
 
+        Route::post('review/create', [CuisineRatingReviewController::class, 'createReview']);
+        Route::post('review/delete', [CuisineRatingReviewController::class, 'deleteReview']);
+        Route::post('review/update', [CuisineRatingReviewController::class, 'updateReview']);
+    }
 );
 
 
@@ -207,5 +210,10 @@ route::group(
         Route::get('rating/daily/cuisine/{branch_cuisine_id}', [CuisineRatingReviewController::class, 'getRatingAverageByDate']);
         Route::get('rating/monthly/cuisine/{branch_cuisine_id}', [CuisineRatingReviewController::class, 'getRatingAverageByMonth']);
         Route::get('rating/yearly/cuisine/{branch_cuisine_id}', [CuisineRatingReviewController::class, 'getRatingAverageByYear']);
+
+
+        Route::get('review/all/cuisine/{branch_cuisine_id}', [CuisineRatingReviewController::class, 'getAllReviews']);
+        Route::get('review/my/cuisine/{branch_cuisine_id}', [CuisineRatingReviewController::class, 'getMyReview']);
+        Route::get('review/count/cuisine/{branch_cuisine_id}', [CuisineRatingReviewController::class, 'getReviewCount']);
     }
 );
