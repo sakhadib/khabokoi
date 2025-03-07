@@ -219,7 +219,7 @@ class CuisineRatingReviewController extends Controller
         }
 
         $rating_avg = $ratings->groupBy(function($date){
-            return \Carbon\Carbon::parse($date->created_at)->format('d');
+            return \Carbon\Carbon::parse($date->created_at)->format('d-m-y');
         });
 
         $rating_avg = $rating_avg->map(function($item, $key){
