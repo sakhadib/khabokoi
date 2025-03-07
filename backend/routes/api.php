@@ -215,5 +215,8 @@ route::group(
         Route::get('review/all/cuisine/{branch_cuisine_id}', [CuisineRatingReviewController::class, 'getAllReviews']);
         Route::get('review/my/cuisine/{branch_cuisine_id}', [CuisineRatingReviewController::class, 'getMyReview']);
         Route::get('review/count/cuisine/{branch_cuisine_id}', [CuisineRatingReviewController::class, 'getReviewCount']);
+        Route::get('review/daily/cuisine/{branch_cuisine_id}', [CuisineRatingReviewController::class, 'getReviewCountByDate']);
+        Route::get('review/monthly/cuisine/{branch_cuisine_id}', [CuisineRatingReviewController::class, 'getReviewCountByMonth']);
+        Route::get('review/yearly/cuisine/{branch_cuisine_id}', [CuisineRatingReviewController::class, 'getReviewCountByYear']);
     }
 );
