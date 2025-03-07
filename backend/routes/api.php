@@ -207,6 +207,8 @@ route::group(
         Route::get('rating/user/cuisine/{branch_cuisine_id}/user/{user_id}', [CuisineRatingReviewController::class, 'getUserRating']);
         Route::get('rating/all/cuisine/{branch_cuisine_id}', [CuisineRatingReviewController::class, 'getAllRating']);
         Route::get('rating/daily/cuisine/{branch_cuisine_id}', [CuisineRatingReviewController::class, 'getRatingAverageByDate']);
+        Route::get('rating/monthly/cuisine/{branch_cuisine_id}', [CuisineRatingReviewController::class, 'getRatingAverageByMonth']);
+        Route::get('rating/yearly/cuisine/{branch_cuisine_id}', [CuisineRatingReviewController::class, 'getRatingAverageByYear']);
     }
 
 );
