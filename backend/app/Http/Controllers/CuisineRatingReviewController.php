@@ -64,7 +64,9 @@ class CuisineRatingReviewController extends Controller
             'branch_cuisine_id' => 'required|integer',
         ]);
 
-        $cuisineRating = CuisineRating::where('branch_cuisine_id', $request->branch_cuisine_id)->where('user_id', auth()->user()->id)->first();
+        $cuisineRating = CuisineRating::where('branch_cuisine_id', $request->branch_cuisine_id)
+                                      ->where('user_id', auth()->user()->id)
+                                      ->first();
 
         if(!$cuisineRating){
             return response()->json([
@@ -113,7 +115,7 @@ class CuisineRatingReviewController extends Controller
 
         return response()->json([
             'message' => 'Rating count fetched successfully',
-            'data' => $ratingCount
+            'count' => $ratingCount
         ], 200);
     }
 
@@ -180,11 +182,10 @@ class CuisineRatingReviewController extends Controller
      * @param $branch_cuisine_id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getAllRatings($branch_cuisine_id)
+    public function getAllRating($branch_cuisine_id)
     {
-        $branchCuisine = BranchCuisine::with(['cuisine', 'ratings' => function($query) {
-            $query->with('user');
-        }])->find($branch_cuisine_id);
+        $branchCuisine = BranchCuisine::with(['cuisine', 'cuisineRating'])
+                                      ->find($branch_cuisine_id);
 
         if (!$branchCuisine) {
             return response()->json([

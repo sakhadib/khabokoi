@@ -9,6 +9,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\BranchFeatureController;
 use App\Http\Controllers\CuisineController;
+use App\Http\Controllers\CuisineRatingReviewController;
 
 
 /*
@@ -178,3 +179,33 @@ Route::group([
     Route::get('show/{id}', [CuisineController::class, 'getBranchCuisineByCuisine']);
 
 });
+
+
+route::group(
+    [
+        'prefix' => 'cuisine',
+        'middleware' => 'api'
+        
+    ], function ($router) {
+
+        Route::post('rating/create', [CuisineRatingReviewController::class, 'createRating']);
+        Route::post('rating/delete', [CuisineRatingReviewController::class, 'deleteRating']);
+    }
+
+);
+
+
+route::group(
+    [
+        'prefix' => 'cuisine',
+        
+    ], function ($router) {
+
+        Route::get('rating/cuisine/{branch_cuisine_id}', [CuisineRatingReviewController::class, 'getAverageRating']);
+        Route::get('rating/count/cuisine/{branch_cuisine_id}', [CuisineRatingReviewController::class, 'getRatingCount']);
+        Route::get('rating/my/cuisine/{branch_cuisine_id}', [CuisineRatingReviewController::class, 'getMyRating']);
+        Route::get('rating/user/cuisine/{branch_cuisine_id}/user/{user_id}', [CuisineRatingReviewController::class, 'getUserRating']);
+        Route::get('rating/all/cuisine/{branch_cuisine_id}', [CuisineRatingReviewController::class, 'getAllRating']);
+    }
+
+);
